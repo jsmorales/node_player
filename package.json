@@ -1,0 +1,29 @@
+{
+  "name": "node_player",
+  "version": "1.0.0",
+  "description": "Reproductor de música web, desde una biblioteca local.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsmorales/node_player.git"
+  },
+  "keywords": [
+    "node_player",
+    "reproductor",
+    "web"
+  ],
+  "author": "jsmorales",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsmorales/node_player/issues"
+  },
+  "homepage": "https://github.com/jsmorales/node_player#readme",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "dependencies": {}
+}
