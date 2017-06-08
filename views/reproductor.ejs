@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
+	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			//http://www.developphp.com/video/JavaScript/Audio-Playlist-Array-Tutorial
+			console.log("Hola reproductor")
+
+			//--------------------------------------------------------------------------------
+			//funcion para crear el reproductor
+			self.audio;
+			self.arr_src_playlist = [];
+
+			//obtener la lista de reproducción
+			$.each($(".item-lista"), function(index, val) {
+				console.log($(this).data("src"))
+				console.log($(this).data("name"))
+				//$(this).data("src")
+				//{"src":$(this).data("src"), "nombre": $(this).data("name")}
+				arr_src_playlist.push({"src":$(this).data("src"), "nombre": $(this).data("name")});
+			});
+
+			console.log(arr_src_playlist)
+
+			//-------------------------------------------------------------------------
+			// Audio Object
+			audio = new Audio();
+			audio.src = arr_src_playlist[0].src;
+			audio.name_song = arr_src_playlist[0].nombre;
+			audio.loop = false;
+			//audio.play();
+			//-------------------------------------------------------------------------
+
+			$("#btn_play").click(function(event) {
+				audio.play();
+			});
+
+			audio.addEventListener("play", function(event){
+				
+				console.log("Reproduciendo...")
+
+				console.log(event)
+
+				$(".panel-title").html(audio.name_song);
+
+
+				$("#btn_play").html('<span class="glyphicon glyphicon-pause"></span>');
+				$("#btn_play").unbind('click');
+
+				$("#btn_play").click(function(event) {
+					audio.pause();
+				});
+			})
+
+			audio.addEventListener("pause", function(){
+				
+				console.log("Pausado...")
+
+				$("#btn_play").html('<span class="glyphicon glyphicon-play"></span>');
+				$("#btn_play").unbind('click');
+
+				$("#btn_play").click(function(event) {
+					audio.play();
+				});
+			})
+
+			$(".item-lista").click(function(event) {
+				
+				var self = $(this);
+
+				audio.src = self.data("src")
+				audio.name_song = self.data("name")				
+
+				audio.play();
+			});
+			//--------------------------------------------------------------------------------
+		})
+	</script>	
+</head>
+<body>
+	<h1 class="text-center">Node Player</h1>
+	<hr>
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div>
+				<h2>Álbum</h2>
+				<hr>
+
+				<%- album %>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">-</h3>
+					<button id="btn_play"><span class="glyphicon glyphicon-play"></span></button>
+				</div>				
+			</div>
+
+		</div>
+	</div>
+
+	
+</body>
+</html>
