@@ -5,7 +5,8 @@
 	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
 	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
 	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript">		
+
 		$(function(){
 			//http://www.developphp.com/video/JavaScript/Audio-Playlist-Array-Tutorial
 			console.log("Hola reproductor")
@@ -18,10 +19,12 @@
 
 			//obtener la lista de reproducción
 			$.each($(".item-lista"), function(index, val) {
-				console.log($(this).data("src"))
-				console.log($(this).data("name"))
+				//console.log($(this).data("src"))
+				//console.log($(this).data("name"))
 				//$(this).data("src")
 				//{"src":$(this).data("src"), "nombre": $(this).data("name")}
+				$(this).attr("data-index-arr-list",index);
+
 				arr_src_playlist.push({"src":$(this).data("src"), "nombre": $(this).data("name")});
 			});
 
@@ -30,22 +33,78 @@
 			//-------------------------------------------------------------------------
 			// Audio Object [inicializacion del audio]
 			audio = new Audio();
-			audio.src = arr_src_playlist[0].src;
-			audio.name_song = arr_src_playlist[0].nombre;
 			audio.loop = false;
 			//audio.play();
+
+			function setAudioObject(index_song){
+				
+				try {
+					audio.src = arr_src_playlist[index_song].src;
+					audio.name_song = arr_src_playlist[index_song].nombre;
+					audio.index_arr_playlist = index_song;
+				} catch(e) {					
+					console.log(e);
+					console.log("Ya no se puede pasar de canción.");								
+				}
+				
+			}
+
+			function canPlay(next_index){
+
+				var index_play = audio.index_arr_playlist;
+					
+				var llaves = Object.keys(arr_src_playlist);
+
+				if (llaves.indexOf(next_index.toString()) != -1) {
+					console.log("Se puede reproducir [index_arr_playlist existe.]")
+					console.log(next_index)
+					setAudioObject(next_index);
+					audio.play();
+				} else {
+					console.log("No se puede reproducir [index_arr_playlist no existe.]")
+					audio.pause();
+				}
+
+			}
+
+			setAudioObject(0);
 			//-------------------------------------------------------------------------
+			
+			function playForwardBackward(type){
+
+				var next_index;
+
+				switch (type) {
+					case "forward":
+							next_index = audio.index_arr_playlist + 1;
+						break;
+					case "backward":
+							next_index = audio.index_arr_playlist - 1;
+						break;					
+				}				
+
+				canPlay(next_index);				
+			}
 
 			$("#btn_play").click(function(event) {
 				audio.play();
+			});			
+
+			$("#btn_forward").click(function(event) {			
+
+				playForwardBackward("forward")
+			});
+
+			$("#btn_backward").click(function(event) {			
+
+				playForwardBackward("backward")
 			});
 
 			$(".item-lista").click(function(event) {
 				
-				var self = $(this);
+				var self = $(this);			
 
-				audio.src = self.data("src")
-				audio.name_song = self.data("name")				
+				setAudioObject(self.data("index-arr-list"));				
 
 				audio.play();
 
@@ -73,6 +132,11 @@
 			    $("#durtimetext").html(durmins+":"+dursecs);
 			}
 			//-------------------------------------------------------------------------
+
+			function setViewReproductor(){
+
+			}
+
 			audio.addEventListener("play", function(event){
 				
 				console.log("Reproduciendo...")				
@@ -98,11 +162,63 @@
 				$("#btn_play").click(function(event) {
 					audio.play();
 				});
+
+				/*si al pausar el current_time es igual al duration time
+				pasa a la siguiente cancion en el array
+				*/
+
+				if (audio.currentTime === audio.duration) {
+					playForwardBackward("forward")
+				}
 			})
 
 			audio.addEventListener("timeupdate", function(){				
 				seektimeupdate();
+			})			
+			//--------------------------------------------------------------------------------
+
+			//--------------------------------------------------------------------------------
+			/**/
+			audio.addEventListener("progress", function(){
+				console.log("Progress...")
+				$(".alert").html("Progress...")
 			})
+
+			audio.addEventListener("loadeddata", function(){
+				console.log("Cargó...")
+				$(".alert").html("Canción OK [loadeddata]")
+			})
+
+			audio.addEventListener("load", function(){
+				console.log("load...")
+				$(".alert").html("load...")
+			})
+
+			//suspend
+			audio.addEventListener("suspend", function(){
+				console.log("suspend...")
+				$(".alert").html("Canción OK [suspend]")
+			})
+
+			//waiting
+			audio.addEventListener("waiting", function(){
+				console.log("waiting...")
+				$(".alert").html("Waiting...")
+			})
+
+			//loadstart
+			audio.addEventListener("loadstart", function(){
+				console.log("loadstart...")
+				$(".alert").html("loadstart...")
+			})
+
+			//playing
+			audio.addEventListener("playing", function(){
+				console.log("playing...")
+				$(".alert").html("playing...")
+			})
+
+			
 			//--------------------------------------------------------------------------------
 		})
 	</script>	
@@ -114,9 +230,6 @@
 	<div class="panel panel-default">
 		<div id="contenedor-principal" class="panel-body text-center contendor-principal">
 			<div>
-				<h2>Álbum</h2>
-				<hr>
-
 				<%- album %>
 			</div>
 						
@@ -126,9 +239,11 @@
 				</div>
 				<div class="panel-body text-center">
 
-					<button id="btn_" class="btn btn-success"><span class="glyphicon glyphicon-backward"></span></button>
+					
+
+					<button id="btn_backward" class="btn btn-primary"><span class="glyphicon glyphicon-backward"></span></button>
 					<button id="btn_play" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
-					<button id="btn_" class="btn btn-success"><span class="glyphicon glyphicon-forward"></span></button>
+					<button id="btn_forward" class="btn btn-primary"><span class="glyphicon glyphicon-forward"></span></button>
 
 					<div id="timebox">
 				    	<span id="curtimetext">00:00</span> / <span id="durtimetext">00:00</span>
@@ -137,7 +252,8 @@
 				    <div class="progress">
 						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
 					</div>
-
+					<div class="alert alert-info"></div>
+					
 				</div>
 			</div>
 
