@@ -14,6 +14,7 @@
 			//funcion para crear el reproductor
 			self.audio;
 			self.arr_src_playlist = [];
+			self.curtimetext;
 
 			//obtener la lista de reproducción
 			$.each($(".item-lista"), function(index, val) {
@@ -27,7 +28,7 @@
 			console.log(arr_src_playlist)
 
 			//-------------------------------------------------------------------------
-			// Audio Object
+			// Audio Object [inicializacion del audio]
 			audio = new Audio();
 			audio.src = arr_src_playlist[0].src;
 			audio.name_song = arr_src_playlist[0].nombre;
@@ -39,15 +40,46 @@
 				audio.play();
 			});
 
+			$(".item-lista").click(function(event) {
+				
+				var self = $(this);
+
+				audio.src = self.data("src")
+				audio.name_song = self.data("name")				
+
+				audio.play();
+
+				return false;
+			});
+			//-------------------------------------------------------------------------
+			function seektimeupdate(){
+
+				var nt = audio.currentTime * (100 / audio.duration);
+				$("#seekslider").val(nt)
+
+				$(".progress-bar").css('width', nt+'%');
+
+				var curmins = Math.floor(audio.currentTime / 60);
+			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
+			    var durmins = Math.floor(audio.duration / 60);
+			    var dursecs = Math.floor(audio.duration - durmins * 60);
+
+				if(cursecs < 10){ cursecs = "0"+cursecs; }
+			    if(dursecs < 10){ dursecs = "0"+dursecs; }
+			    if(curmins < 10){ curmins = "0"+curmins; }
+			    if(durmins < 10){ durmins = "0"+durmins; }
+								
+				$("#curtimetext").html(curmins+":"+cursecs);			    
+			    $("#durtimetext").html(durmins+":"+dursecs);
+			}
+			//-------------------------------------------------------------------------
 			audio.addEventListener("play", function(event){
 				
-				console.log("Reproduciendo...")
-
-				console.log(event)
-
+				console.log("Reproduciendo...")				
+				//titulo cancion
 				$(".panel-title").html(audio.name_song);
 
-
+				//cambio de funcionalidad e icono del boton de accion
 				$("#btn_play").html('<span class="glyphicon glyphicon-pause"></span>');
 				$("#btn_play").unbind('click');
 
@@ -58,7 +90,7 @@
 
 			audio.addEventListener("pause", function(){
 				
-				console.log("Pausado...")
+				console.log("Pausado...")				
 
 				$("#btn_play").html('<span class="glyphicon glyphicon-play"></span>');
 				$("#btn_play").unbind('click');
@@ -68,15 +100,9 @@
 				});
 			})
 
-			$(".item-lista").click(function(event) {
-				
-				var self = $(this);
-
-				audio.src = self.data("src")
-				audio.name_song = self.data("name")				
-
-				audio.play();
-			});
+			audio.addEventListener("timeupdate", function(){				
+				seektimeupdate();
+			})
 			//--------------------------------------------------------------------------------
 		})
 	</script>	
@@ -86,19 +112,33 @@
 	<hr>
 
 	<div class="panel panel-default">
-		<div class="panel-body">
+		<div id="contenedor-principal" class="panel-body text-center contendor-principal">
 			<div>
 				<h2>Álbum</h2>
 				<hr>
 
 				<%- album %>
 			</div>
-
+						
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">-</h3>
-					<button id="btn_play"><span class="glyphicon glyphicon-play"></span></button>
-				</div>				
+				</div>
+				<div class="panel-body text-center">
+
+					<button id="btn_" class="btn btn-success"><span class="glyphicon glyphicon-backward"></span></button>
+					<button id="btn_play" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+					<button id="btn_" class="btn btn-success"><span class="glyphicon glyphicon-forward"></span></button>
+
+					<div id="timebox">
+				    	<span id="curtimetext">00:00</span> / <span id="durtimetext">00:00</span>
+				    </div>
+
+				    <div class="progress">
+						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+
+				</div>
 			</div>
 
 		</div>
