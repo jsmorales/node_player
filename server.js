@@ -4,6 +4,12 @@ var app = express()
 //-------------------------------------------------------------
 
 //-------------------------------------------------------------
+//tags de los audios para hacer una mejor clasificación
+//de los mismos.
+var id3 = require('id3js');
+//-------------------------------------------------------------
+
+//-------------------------------------------------------------
 //instancia lector de directorios
 var manage_files = require("./manage_files")
 //var path_biblio = "/home/johan/Descargas/Metal"
@@ -27,6 +33,34 @@ app.get('/',function(req,res){
 	
 	res.render('home.ejs', {"biblioteca":lista});
 });
+
+/*
+-->Mapeo general de lectura de folder music
+
+{
+	artists: [
+		name: 'Slayer',		
+		albums: [
+			{
+				name: 'World Painted Blood',
+				year: '2009',
+				tracks: [
+					{
+						name: 'World Painted Blood',
+						track: '1',
+						src: 'ruta_archivo',
+					},
+				],
+				genre: 'Thrash Metal',
+				path: 'ruta_folder',
+			},
+
+		],
+
+	],
+
+}
+*/
 
 //clase renderizador
 function createBiblioteca(lista){
@@ -59,6 +93,16 @@ app.get('/reproductor', function(req,res){
 	var lista_audio = manage_files.getAlbum(path_album)
 
 	console.log(lista_audio);
+
+	console.log(path_album+"/"+lista_audio[0])
+
+	/*Sistema lector de tags de los audios, se va a usar para hacer la clasificacion
+	de los archivos y obtener los datos de cada uno sin necesidad de BD.
+	*/
+
+	id3({ file: path_album+"/"+lista_audio[1], type: id3.OPEN_LOCAL }, function(err, tags) {
+	    console.log(tags)
+	});
 
 	res.render("reproductor.ejs", {"album":createAlbum(lista_audio, path_album, nom_album)});
 })
