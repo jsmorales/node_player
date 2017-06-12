@@ -4,19 +4,11 @@ var app = express()
 //-------------------------------------------------------------
 
 //-------------------------------------------------------------
-//tags de los audios para hacer una mejor clasificación
-//de los mismos.
-var id3 = require('id3js');
-//-------------------------------------------------------------
-
-//-------------------------------------------------------------
 //instancia lector de directorios
 var manage_files = require("./manage_files")
-//var path_biblio = "/home/johan/Descargas/Metal"
-///home/johan/Descargas/Metal/Decapitated/Decapitated - Nihility (2002)/06 - Spheres Of Madness.mp3
-//var path_song = "/home/johan/Descargas/Metal/Decapitated/Decapitated - Nihility (2002)/06 - Spheres Of Madness.mp3"
+
 var path_biblioteca = __dirname+"/public/music"
-var path_biblio = "/home/johan/Descargas/Metal"
+
 //-------------------------------------------------------------
 
 // se declara el directorio public para uso de almacenamiento
@@ -29,38 +21,14 @@ app.get('/',function(req,res){
 
 	//console.log(manage_files.getBiblioteca(path_biblioteca))
 
+	//manage_files.getPathsSongs(path_biblioteca)
+	manage_files.getMapaBiblioteca(manage_files.getPathsSongs(path_biblioteca));
+
 	var lista = createBiblioteca(manage_files.getBiblioteca(path_biblioteca))
 	
 	res.render('home.ejs', {"biblioteca":lista});
 });
 
-/*
--->Mapeo general de lectura de folder music
-
-{
-	artists: [
-		name: 'Slayer',		
-		albums: [
-			{
-				name: 'World Painted Blood',
-				year: '2009',
-				tracks: [
-					{
-						name: 'World Painted Blood',
-						track: '1',
-						src: 'ruta_archivo',
-					},
-				],
-				genre: 'Thrash Metal',
-				path: 'ruta_folder',
-			},
-
-		],
-
-	],
-
-}
-*/
 
 //clase renderizador
 function createBiblioteca(lista){
@@ -81,28 +49,19 @@ function createDiv(contenido){
 }
 
 
-
 app.get('/reproductor', function(req,res){
 
 	var nom_album = req.query.nombre_album;
 
 	var path_album = path_biblioteca+"/"+nom_album;
 
-	console.log(path_album)
+	//console.log(path_album)
 
 	var lista_audio = manage_files.getAlbum(path_album)
 
-	console.log(lista_audio);
+	//console.log(lista_audio);
 
-	console.log(path_album+"/"+lista_audio[0])
-
-	/*Sistema lector de tags de los audios, se va a usar para hacer la clasificacion
-	de los archivos y obtener los datos de cada uno sin necesidad de BD.
-	*/
-
-	id3({ file: path_album+"/"+lista_audio[1], type: id3.OPEN_LOCAL }, function(err, tags) {
-	    console.log(tags)
-	});
+	//console.log(path_album+"/"+lista_audio[0])	
 
 	res.render("reproductor.ejs", {"album":createAlbum(lista_audio, path_album, nom_album)});
 })

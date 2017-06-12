@@ -34,7 +34,16 @@
 			// Audio Object [inicializacion del audio]
 			audio = new Audio();
 			audio.loop = false;
-			//audio.play();
+			
+			/*
+			//se añade evento
+			$(audio).bind("loadplay", function(e){
+				console.log("Ejecuta loadplay!")
+			})
+
+			//se ejecuta el evento
+			$(audio).trigger('loadplay')*/
+			
 
 			function setAudioObject(index_song){
 				
@@ -87,7 +96,7 @@
 			}
 
 			$("#btn_play").click(function(event) {
-				audio.play();
+				audio.play();								
 			});			
 
 			$("#btn_forward").click(function(event) {			
@@ -204,21 +213,7 @@
 			audio.addEventListener("waiting", function(){
 				console.log("waiting...")
 				$(".alert").html("Waiting...")
-			})
-
-			//loadstart
-			audio.addEventListener("loadstart", function(){
-				console.log("loadstart...")
-				$(".alert").html("loadstart...")
-			})
-
-			//playing
-			audio.addEventListener("playing", function(){
-				console.log("playing...")
-				$(".alert").html("playing...")
-			})
-
-			
+			})			
 			//--------------------------------------------------------------------------------
 		})
 	</script>	
