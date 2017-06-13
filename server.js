@@ -6,6 +6,7 @@ var app = express()
 //-------------------------------------------------------------
 //instancia lector de directorios
 var manage_files = require("./manage_files")
+var getMapaBiblioteca = require("./manage_tags.js")
 
 var path_biblioteca = __dirname+"/public/music"
 
@@ -22,7 +23,23 @@ app.get('/',function(req,res){
 	//console.log(manage_files.getBiblioteca(path_biblioteca))
 
 	//manage_files.getPathsSongs(path_biblioteca)
-	manage_files.getMapaBiblioteca(manage_files.getPathsSongs(path_biblioteca));
+	
+	//const EventEmitter = require('events');
+	//const emisorId3 = new EventEmitter();
+
+	var paths = manage_files.getPathsSongs(path_biblioteca);
+
+	//console.log(paths)
+
+	var artistas = new getMapaBiblioteca(paths);
+
+	artistas.on('artistsReady', function(artists) {
+		console.log(artists)
+	});
+
+	//var artistas = biblio._events.artistsReady()
+
+	//console.log(artistas)
 
 	var lista = createBiblioteca(manage_files.getBiblioteca(path_biblioteca))
 	

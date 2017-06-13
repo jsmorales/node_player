@@ -1,8 +1,6 @@
 //-----------------------------------------------
 var fs = require("fs")
 var path = require('path')
-//-----------------------------------------------
-
 //-----------------------------------------------------
 //Función para ordenamiento natural de strings con numeros que le preceden
 //https://stackoverflow.com/questions/15478954/sort-array-elements-string-with-numbers-natural-sort
@@ -44,57 +42,6 @@ exports.getCover = function(srcpath){
 }
 
 
-/*
--->Mapeo general de lectura de folder music
-
-var objt_music = {
-    artists: [
-
-        {
-            name: 'Slayer',     
-            albums: [
-                {
-                    name: 'World Painted Blood',
-                    year: '2009',
-                    tracks: [
-                        {
-                            name: 'World Painted Blood',
-                            track: '1',
-                            src: 'ruta_archivo',
-                        },
-                    ],
-                    genre: 'Thrash Metal',
-                    path: 'ruta_folder',
-                },
-
-            ],
-        }
-
-    ],
-
-}*/
-
-//-------------------------------------------------------------
-//tags de los audios para hacer una mejor clasificación
-//de los mismos.
-//var Promise = require('promise');
-
-var id3 = require('id3js');
-//var read = Promise.denodeify(fs.readFile)
-//var promise_id3 = Promise.denodeify(id3);
-//-------------------------------------------------------------
-
-/*
-Sistema lector de tags de los audios, se va a usar para hacer la clasificacion
-de los archivos y obtener los datos de cada uno sin necesidad de BD.
-
-
-id3({ file: path_album+"/"+lista_audio[1], type: id3.OPEN_LOCAL }, function(err, tags) {
-    console.log(tags)
-});
-*/
-
-
 exports.getPathsSongs = function(srcpathbiblioteca){
     
     var self = this;
@@ -117,77 +64,10 @@ exports.getPathsSongs = function(srcpathbiblioteca){
             //leer los tags de cada song y clasificarla
             //console.log(srcpathbiblioteca+"/"+folder+"/"+song)
             paths_songs.push(srcpathbiblioteca+"/"+folder+"/"+song);
-            
-            /*
-            var getArtists = new Promise(function(resolve, reject){
-
-                id3({ file: srcpathbiblioteca+"/"+folder+"/"+song, type: id3.OPEN_LOCAL }, function(err, tags) {
-                    //console.log(tags.artist)
-
-
-                    if (err) {
-                        reject(err);
-                    } else {
-
-                        var artista = tags.artist.replace(/\0/g, '');
-
-                        if (artists.indexOf(artista) === -1) {
-                            artists.push(artista)
-                        }
-                        
-                        resolve(artists);
-                    }                   
-
-                    //console.log(artists)           
-                });
-
-            });
-
-            
-            getArtists.then(function(artistas){
-                console.log(artistas)                
-            })*/
 
         })
         //--------------------------------------
     })
 
     return paths_songs;   
-}
-
-exports.getMapaBiblioteca = function(arr){
-
-    //console.log(arr.length)
-    //https://nodejs.org/api/events.html#events_class_eventemitter
-
-    var artists = [];
-
-    var getArtists = new Promise (function(resolve, reject){
-
-        arr.forEach(function(path_song, index){
-            /**/
-            id3({ file: path_song, type: id3.OPEN_LOCAL }, function(err, tags) {
-                //console.log(tags.artist)
-
-                var artista = tags.artist.replace(/\0/g, '');
-
-                if (artists.indexOf(artista) === -1) {
-                    artists.push(artista)
-                }
-
-                console.log(artists)
-
-
-            });
-            //console.log(index)
-            //artists.push(index)
-        })
-
-        resolve(artists);
-    })
-
-    getArtists.then(function(art){
-        console.log(art)
-    })
-
 }
