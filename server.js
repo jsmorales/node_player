@@ -16,106 +16,104 @@ var path_biblioteca = __dirname+"/public/music"
 // de archivos estaticos
 app.use('/public', express.static(__dirname + '/public'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
+app.use('/img', express.static(__dirname + '/img'));
 
 //-------------------------------------------------------------
 app.get('/',function(req,res){
 
-	//console.log(manage_files.getBiblioteca(path_biblioteca))
-
-	//manage_files.getPathsSongs(path_biblioteca)
-	
-	//const EventEmitter = require('events');
-	//const emisorId3 = new EventEmitter();
-
 	var paths = manage_files.getPathsSongs(path_biblioteca);
 
-	//console.log(paths)
+	console.log(paths)
 
 	var artistas = new getMapaBiblioteca(paths);
 
 	artistas.on('artistsReady', function(artists) {
-		console.log(artists)
-	});
-
-	//var artistas = biblio._events.artistsReady()
-
-	//console.log(artistas)
-
-	var lista = createBiblioteca(manage_files.getBiblioteca(path_biblioteca))
+		//console.log(artists)
+		res.render('home.ejs', {"artists":artists,"lista":false});
+	});	
 	
-	res.render('home.ejs', {"biblioteca":lista});
 });
-
-
-//clase renderizador
-function createBiblioteca(lista){
-	
-	let res = "";
-
-	lista.forEach( function(element, index) {
-		//console.log(index)
-		res += createDiv(element) 
-	});
-
-	return res;
-}
-
-//clase renderizador
-function createDiv(contenido){
-	return "<div><a href='/reproductor?nombre_album="+contenido+"'>"+contenido+" <span class='glyphicon glyphicon-chevron-right'></span></a> </div>";
-}
-
 
 app.get('/reproductor', function(req,res){
 
-	var nom_album = req.query.nombre_album;
+	var nom_directory = req.query.path_album.replace(/\/+\w+\/+\w+\/+\w+\/+\w+\/+/g, '');
 
-	var path_album = path_biblioteca+"/"+nom_album;
+	var path_album = req.query.path_album;
+
+	var nombre_album = req.query.nombre_album;
+
+	var anio_album = req.query.anio;
+
+	var nombre_artista = req.query.nombre_artista;
+
+	var genre = req.query.genre;
 
 	//console.log(path_album)
 
-	var lista_audio = manage_files.getAlbum(path_album)
+	var lista_audio = manage_files.getAlbum(req.query.path_album)
 
 	//console.log(lista_audio);
 
-	//console.log(path_album+"/"+lista_audio[0])	
+	//console.log(path_album+"/"+lista_audio[0	
 
-	res.render("reproductor.ejs", {"album":createAlbum(lista_audio, path_album, nom_album)});
+	var paths = manage_files.getPathsSongs(path_biblioteca);
+
+	console.log(paths)
+
+	var artistas = new getMapaBiblioteca(paths);
+
+	artistas.on('artistsReady', function(artists) {
+		//console.log(artists)
+		res.render("home.ejs", {"artists":artists,"lista":createAlbum(lista_audio, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre)});
+	});
 })
 
 //clase renderizador
-function createAlbum(lista, path_album, nombre_album){
+function createAlbum(lista, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre){
 
 	var res = "";
+	
+	res += createDivColMd(4, createCover(nom_directory, path_album), ["text-center"]);
 
-	res += createTitulo(nombre_album, path_album);
-	res += createListaCanciones(lista, nombre_album);
+	res += createDivColMd(4, createListaCanciones(lista, nom_directory), []);
+	res += createDivColMd(4, createInfo(nombre_album, anio_album, nombre_artista, genre), ["text-center"]);
 
-	return res;
+	return createDivColMd(12, res, []);
 }
 
-function createTitulo(nombre, path_album){
-	return "<h3>"+nombre+"</h3> <img class='img-responsive img-thumbnail' src='/public/music/"+nombre+"/"+manage_files.getCover(path_album)+"' height='300' width='300'> ";
+function createDivColMd(md, contenido, arr_clases){
+	var clases = arr_clases.join(" ");
+
+	return '<div class="col-md-'+md+' '+clases+'">'+contenido+'</div>';
+}
+
+function createInfo(nombre_album, anio_album, nombre_artista, genre){
+	return "<ul class='info-album list-group'> <li class='list-group-item'> Artista: "+nombre_artista+"</li> <li class='list-group-item'> Album: "+nombre_album+"</li> <li class='list-group-item'> Género: "+genre+"</li> <li class='list-group-item'> Año: "+anio_album+"</li> </ul>";
+}
+
+function createCover(nombre, path_album){
+
+	console.log(manage_files.getCover(path_album).length)
+	
+	var src = manage_files.getCover(path_album).length !== 0 ? "/public/music/"+nombre+"/"+manage_files.getCover(path_album) : "/img/missing.png";
+
+	return "<img class='img-responsive img-cover' src='"+src+"' height='300' width='300'>";
 }
 
 function createListaCanciones(lista, nombre_album){
 
-	var res = "<ul class='text-left lista-canciones'>";
+	var res = "<div class='list-group lista-canciones'>";
 
 	lista.forEach( function(element, index) {
 		res += createLiSong(element, nombre_album);
 	});	
 
-	return res+"</ul>";
-}
-
-function createUl(cont){
-	return "<ul>"+cont+"</ul>";
+	return res+"</div>";
 }
 
 function createLiSong(nombre_cancion, nombre_album){
 	//<div>'+nombre_cancion+'</div> 
-	return '<li> <a href="#" class="item-lista" data-src="/public/music/'+nombre_album+'/'+nombre_cancion+'" data-name="'+nombre_cancion+'">'+nombre_cancion+'</a></li>';
+	return '<a href="#" class="item-lista list-group-item" data-src="/public/music/'+nombre_album+'/'+nombre_cancion+'" data-name="'+nombre_cancion+'">'+nombre_cancion+'</a>';
 }
 
 //-------------------------------------------------------------

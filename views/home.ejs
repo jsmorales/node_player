@@ -4,19 +4,310 @@
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
 	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
-	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>	
+	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript">		
+
+		$(function(){
+			//http://www.developphp.com/video/JavaScript/Audio-Playlist-Array-Tutorial
+			console.log("Hola reproductor")
+
+			//--------------------------------------------------------------------------------
+			//funcion para crear el reproductor
+			self.audio;
+			self.arr_src_playlist = [];
+			self.curtimetext;
+
+			//obtener la lista de reproducción
+			$.each($(".item-lista"), function(index, val) {
+				//console.log($(this).data("src"))
+				//console.log($(this).data("name"))
+				//$(this).data("src")
+				//{"src":$(this).data("src"), "nombre": $(this).data("name")}
+				$(this).attr("data-index-arr-list",index);
+
+				arr_src_playlist.push({"src":$(this).data("src"), "nombre": $(this).data("name")});
+			});
+
+			console.log(arr_src_playlist)
+
+			//-------------------------------------------------------------------------
+			// Audio Object [inicializacion del audio]
+			audio = new Audio();
+			audio.loop = false;
+			
+			/*
+			//se añade evento
+			$(audio).bind("loadplay", function(e){
+				console.log("Ejecuta loadplay!")
+			})
+
+			//se ejecuta el evento
+			$(audio).trigger('loadplay')*/
+			
+
+			function setAudioObject(index_song){
+				
+				try {
+					audio.src = arr_src_playlist[index_song].src;
+					audio.name_song = arr_src_playlist[index_song].nombre;
+					audio.index_arr_playlist = index_song;
+				} catch(e) {					
+					console.log(e);
+					console.log("Ya no se puede pasar de canción.");								
+				}
+				
+			}
+
+			function canPlay(next_index){
+
+				var index_play = audio.index_arr_playlist;
+					
+				var llaves = Object.keys(arr_src_playlist);
+
+				if (llaves.indexOf(next_index.toString()) != -1) {
+					console.log("Se puede reproducir [index_arr_playlist existe.]")
+					console.log(next_index)
+					setAudioObject(next_index);
+					audio.play();
+				} else {
+					console.log("No se puede reproducir [index_arr_playlist no existe.]")
+					audio.pause();
+				}
+
+			}
+
+			setAudioObject(0);
+			//-------------------------------------------------------------------------
+			
+			function playForwardBackward(type){
+
+				var next_index;
+
+				switch (type) {
+					case "forward":
+							next_index = audio.index_arr_playlist + 1;
+						break;
+					case "backward":
+							next_index = audio.index_arr_playlist - 1;
+						break;					
+				}				
+
+				canPlay(next_index);				
+			}
+
+			$("#btn_play").click(function(event) {
+				audio.play();								
+			});			
+
+			$("#btn_forward").click(function(event) {			
+
+				playForwardBackward("forward")
+			});
+
+			$("#btn_backward").click(function(event) {			
+
+				playForwardBackward("backward")
+			});
+
+			$(".item-lista").click(function(event) {
+				
+				var self = $(this);			
+
+				setAudioObject(self.data("index-arr-list"));				
+
+				audio.play();
+
+				return false;
+			});
+			//-------------------------------------------------------------------------
+			function seektimeupdate(){
+
+				var nt = audio.currentTime * (100 / audio.duration);
+				$("#seekslider").val(nt)
+
+				$(".progress-bar").css('width', nt+'%');
+
+				var curmins = Math.floor(audio.currentTime / 60);
+			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
+			    var durmins = Math.floor(audio.duration / 60);
+			    var dursecs = Math.floor(audio.duration - durmins * 60);
+
+				if(cursecs < 10){ cursecs = "0"+cursecs; }
+			    if(dursecs < 10){ dursecs = "0"+dursecs; }
+			    if(curmins < 10){ curmins = "0"+curmins; }
+			    if(durmins < 10){ durmins = "0"+durmins; }
+								
+				$("#curtimetext").html(curmins+":"+cursecs);			    
+			    $("#durtimetext").html(durmins+":"+dursecs);
+			}
+			//-------------------------------------------------------------------------
+
+			function setViewReproductor(){
+
+			}
+
+			audio.addEventListener("play", function(event){
+				
+				console.log("Reproduciendo...")				
+				//titulo cancion
+				$(".panel-title").html(audio.name_song);
+
+				//cambio de funcionalidad e icono del boton de accion
+				$("#btn_play").html('<span class="glyphicon glyphicon-pause"></span>');
+				$("#btn_play").unbind('click');
+
+				$("#btn_play").click(function(event) {
+					audio.pause();
+				});
+			})
+
+			audio.addEventListener("pause", function(){
+				
+				console.log("Pausado...")				
+
+				$("#btn_play").html('<span class="glyphicon glyphicon-play"></span>');
+				$("#btn_play").unbind('click');
+
+				$("#btn_play").click(function(event) {
+					audio.play();
+				});
+
+				/*si al pausar el current_time es igual al duration time
+				pasa a la siguiente cancion en el array
+				*/
+
+				if (audio.currentTime === audio.duration) {
+					playForwardBackward("forward")
+				}
+			})
+
+			audio.addEventListener("timeupdate", function(){				
+				seektimeupdate();
+			})			
+			//--------------------------------------------------------------------------------
+
+			//--------------------------------------------------------------------------------
+			/**/
+			audio.addEventListener("progress", function(){
+				console.log("Progress...")
+				$(".alert").html("Progress...")
+			})
+
+			audio.addEventListener("loadeddata", function(){
+				console.log("Cargó...")
+				$(".alert").html("Canción OK [loadeddata]")
+			})
+
+			audio.addEventListener("load", function(){
+				console.log("load...")
+				$(".alert").html("load...")
+			})
+
+			//suspend
+			audio.addEventListener("suspend", function(){
+				console.log("suspend...")
+				$(".alert").html("Canción OK [suspend]")
+			})
+
+			//waiting
+			audio.addEventListener("waiting", function(){
+				console.log("waiting...")
+				$(".alert").html("Waiting...")
+			})			
+			//--------------------------------------------------------------------------------
+		})
+	</script>
+
 </head>
 <body>
-	<h1 class="text-center">Node Player</h1>
-	<hr>
+	
+	<div class="panel panel-default">		
 
-	<div class="panel panel-default">
 		<div class="panel-body">
-			<div>
-				<h2>Biblioteca</h2>
-				<hr>
-				<%- biblioteca %>
+
+			<div class="col-md-12">
+
+				<div class="col-md-3">
+					
+					<a href="/" class="icon-logo"> <h4><span class="glyphicon glyphicon-play-circle"></span> Node Player</h4> </a>					
+
+					<h3 class="text-center">Artista / Album</h3>
+					
+					<hr>				
+					
+					<% if(artists){ %>
+						
+						<div class="list-group lista-artistas">
+
+							<% artists.forEach(function(element, index){%>
+								
+								<button type="button" class="list-group-item list-group-item-success" data-toggle="collapse" data-target="#collapseExample<%=index%>" aria-expanded="false" aria-controls="collapseExample"> <span class="glyphicon glyphicon-chevron-down"></span> <%=element.name%></button>						
+								
+								<div class="collapse" id="collapseExample<%=index%>">
+									<% element.albums.forEach(function(album, index){%>
+										<a href="/reproductor?path_album=<%=album.path%>&nombre_album=<%=album.name%>&anio=<%=album.year%>&nombre_artista=<%=element.name%>&genre=<%=album.genre%>" class="list-group-item"> <%=album.name%> - <%=album.year%> - <%=album.genre%></a>
+									<%})%>
+								</div>
+
+							<%})%>
+
+						</div>
+
+					<% }else{ %>
+						<br>
+						<div class="alert alert-danger">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							En este momento no hay música.
+						</div>
+					<%}%>
+				</div>				
+
+				<div class="col-md-9 contenedor-reproductor">
+
+					<% if(lista){ %>
+
+
+					
+						<div class="cont-lista">
+							<%- lista%>
+						</div>
+						<!-- -->
+						<div class="col-md-12">							
+								
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title">-</h3>
+								</div>
+								<div class="panel-body text-center">							
+
+									<button id="btn_backward" class="btn btn-primary"><span class="glyphicon glyphicon-backward"></span></button>
+									<button id="btn_play" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+									<button id="btn_forward" class="btn btn-primary"><span class="glyphicon glyphicon-forward"></span></button>
+
+									<div id="timebox">
+								    	<span id="curtimetext">00:00</span> / <span id="durtimetext">00:00</span>
+								    </div>
+
+								    <div class="progress">
+										<div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+									</div>
+									<div class="alert alert-info"></div>
+									
+								</div>
+							</div>
+
+						</div>	
+
+					<% }else{ %>
+						<br>
+						<div class="alert alert-info">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							En este momento no hay lista de reproducción.
+						</div>
+					<%}%>
+				</div>
 			</div>
+
 		</div>
 	</div>
 
