@@ -29,7 +29,7 @@ app.get('/',function(req,res){
 
 	artistas.on('artistsReady', function(artists) {
 		//console.log(artists)
-		res.render('home.ejs', {"artists":artists,"lista":false});
+		res.render('home.ejs', {"artists":artists,"lista_canciones":false});
 	});	
 	
 });
@@ -64,7 +64,8 @@ app.get('/reproductor', function(req,res){
 
 	artistas.on('artistsReady', function(artists) {
 		//console.log(artists)
-		res.render("home.ejs", {"artists":artists,"lista":createAlbum(lista_audio, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre)});
+		//createAlbum(lista_audio, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre)
+		res.render("home.ejs", {"artists":artists,"info":createInfo(nombre_album, anio_album, nombre_artista, genre),"cover":createCover(nom_directory, path_album),"lista_canciones":createListaCanciones(lista_audio,nom_directory)});
 	});
 })
 
@@ -87,15 +88,16 @@ function createDivColMd(md, contenido, arr_clases){
 	return '<div class="col-md-'+md+' '+clases+'">'+contenido+'</div>';
 }
 
+//----------------------------------------------------------------------
 function createInfo(nombre_album, anio_album, nombre_artista, genre){
 	return "<ul class='info-album list-group'> <li class='list-group-item'> Artista: "+nombre_artista+"</li> <li class='list-group-item'> Album: "+nombre_album+"</li> <li class='list-group-item'> Género: "+genre+"</li> <li class='list-group-item'> Año: "+anio_album+"</li> </ul>";
 }
 
 function createCover(nombre, path_album){
 
-	console.log(manage_files.getCover(path_album).length)
+	//console.log(manage_files.getCover(path_album).length)
 	
-	var src = manage_files.getCover(path_album).length !== 0 ? "/public/music/"+nombre+"/"+manage_files.getCover(path_album) : "/img/missing.png";
+	var src = manage_files.getCover(path_album).length > 0 ? "/public/music/"+nombre+"/"+manage_files.getCover(path_album)[0] : "/img/missing.png";
 
 	return "<img class='img-responsive img-cover' src='"+src+"' height='300' width='300'>";
 }
@@ -115,6 +117,8 @@ function createLiSong(nombre_cancion, nombre_album){
 	//<div>'+nombre_cancion+'</div> 
 	return '<a href="#" class="item-lista list-group-item" data-src="/public/music/'+nombre_album+'/'+nombre_cancion+'" data-name="'+nombre_cancion+'">'+nombre_cancion+'</a>';
 }
+//----------------------------------------------------------------------
+
 
 //-------------------------------------------------------------
 app.listen(3000, function(){

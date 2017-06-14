@@ -84,16 +84,23 @@
 
 				var next_index;
 
-				switch (type) {
-					case "forward":
-							next_index = audio.index_arr_playlist + 1;
-						break;
-					case "backward":
-							next_index = audio.index_arr_playlist - 1;
-						break;					
-				}				
+				audio.pause();
+				/**/
+				setTimeout(function(){
 
-				canPlay(next_index);				
+					switch (type) {
+						case "forward":
+								next_index = audio.index_arr_playlist + 1;
+							break;
+						case "backward":
+								next_index = audio.index_arr_playlist - 1;
+							break;					
+					}				
+
+					canPlay(next_index);
+
+				},1000)
+								
 			}
 
 			$("#btn_play").click(function(event) {
@@ -112,11 +119,17 @@
 
 			$(".item-lista").click(function(event) {
 				
-				var self = $(this);			
+				var self = $(this);
 
-				setAudioObject(self.data("index-arr-list"));				
+				audio.pause()
 
-				audio.play();
+				setTimeout(function(){
+
+					setAudioObject(self.data("index-arr-list"));				
+
+					audio.play();
+
+				}, 1000)				
 
 				return false;
 			});
@@ -149,7 +162,18 @@
 
 			audio.addEventListener("play", function(event){
 				
-				console.log("Reproduciendo...")				
+				console.log("Reproduciendo...")
+				//audio.index_arr_playlist
+				
+				$.each($(".item-lista"), function(index, val) {
+					
+					console.log($(this).data("index-arr-list"))
+					/**/
+					if ($(this).data("index-arr-list") === audio.index_arr_playlist) {
+						$(this).addClass('active')
+					}
+				});
+
 				//titulo cancion
 				$(".panel-title").html(audio.name_song);
 
@@ -164,7 +188,16 @@
 
 			audio.addEventListener("pause", function(){
 				
-				console.log("Pausado...")				
+				console.log("Pausado...")
+
+				$.each($(".item-lista"), function(index, val) {
+					console.log(audio.index_arr_playlist)
+					console.log($(this).data("index-arr-list"))
+					/**/
+					if ($(this).data("index-arr-list") === audio.index_arr_playlist) {
+						$(this).removeClass('active')
+					}
+				});				
 
 				$("#btn_play").html('<span class="glyphicon glyphicon-play"></span>');
 				$("#btn_play").unbind('click');
@@ -265,38 +298,53 @@
 
 				<div class="col-md-9 contenedor-reproductor">
 
-					<% if(lista){ %>
+					<% if(lista_canciones){ %>					
+						
+						<!-- <%- info %> text-center-->					
 
+						<div class="col-md-12">									
+																				
+							<br>
 
-					
-						<div class="cont-lista">
-							<%- lista%>
-						</div>
-						<!-- -->
-						<div class="col-md-12">							
-								
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<h3 class="panel-title">-</h3>
-								</div>
-								<div class="panel-body text-center">							
+								<div class="">									
 
-									<button id="btn_backward" class="btn btn-primary"><span class="glyphicon glyphicon-backward"></span></button>
-									<button id="btn_play" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
-									<button id="btn_forward" class="btn btn-primary"><span class="glyphicon glyphicon-forward"></span></button>
+									<div class="panel-body">
 
-									<div id="timebox">
-								    	<span id="curtimetext">00:00</span> / <span id="durtimetext">00:00</span>
-								    </div>
+										<div class="col-md-6 text-center">
+											
+											<%- cover %>
+											
+											<br>
+											<h3 class="panel-title title-song">-</h3>							
+											<br>
 
-								    <div class="progress">
-										<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+											<button id="btn_backward" class="btn btn-primary"><span class="glyphicon glyphicon-backward"></span></button>
+											<button id="btn_play" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+											<button id="btn_forward" class="btn btn-primary"><span class="glyphicon glyphicon-forward"></span></button>
+
+											<div id="timebox">
+										    	<span id="curtimetext">00:00</span> / <span id="durtimetext">00:00</span>
+										    </div>
+
+										    <div class="progress">
+												<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+											</div>
+											<div class="alert"></div>
+
+										</div>
+
+										<div class="col-md-6 cont-lista">
+											<%- lista_canciones %>
+										</div>
+
+										<div class="col-md-6">
+											<%- info %>
+										</div>
+										
 									</div>
-									<div class="alert"></div>
-									
-								</div>
-							</div>
 
+								</div>
+												
 						</div>	
 
 					<% }else{ %>
