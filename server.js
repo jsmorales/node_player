@@ -17,6 +17,7 @@ var path_biblioteca = __dirname+"/public/music"
 app.use('/public', express.static(__dirname + '/public'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.use('/img', express.static(__dirname + '/img'));
+app.use('/js', express.static(__dirname + '/js'));
 
 //-------------------------------------------------------------
 app.get('/',function(req,res){
