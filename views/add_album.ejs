@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Node Player</title>
+	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/bootswatch/cyborg/bootstrap.css">
+	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			$("#frm_sudida_album").submit(function(event) {
+				
+				$("#btn_subida_action").html("Subiendo Archivos, por favor espere...")
+									   .attr('disabled', 'disabled');
+
+			});
+		});
+	</script>
+</head>
+<body>
+
+	<div class="col-md-12 cont-principal-player">
+
+		<a href="/" class="icon-logo"> <h4><span class="glyphicon glyphicon-play-circle"></span> Node Player</h4> </a>
+
+		<div class="col-md-6 col-md-offset-3">
+
+			<% if(notification.estado === "ok"){ %>
+
+				<div class="alert alert-success">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<strong><%= notification.estado%></strong> <%= notification.mensaje%>
+				</div>
+
+			<% }else{ %>
+				<div class="alert alert-danger">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<strong><%= notification.estado%></strong> <%= notification.mensaje%>
+				</div>
+			<%}%>		
+		
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Subida de Album</h3>
+				</div>
+				<div class="panel-body">
+					
+					<form id="frm_sudida_album" action="/upload" method='POST' role="form" enctype='multipart/form-data'>
+						<div class="form-group">
+					   		<label for="">Nombre Album</label>
+					   		<input type="input" name='nom_album' class="form-control" required="true">
+					   </div>
+					   <div class="form-group">
+					   		<label for="">Archivos</label>
+					   		<input type="file" name='archivo' multiple="true" class="form-control">
+					   </div>
+					   <div class="form-group">
+
+					   		<button id="btn_subida_action" type="submit" class="btn btn-primary"> <span class="glyphicon glyphicon-upload"></span> Subir</button>
+					   	</div>
+					</form>
+
+				</div>
+			</div>
+
+
+		</div>
+	
+	</div>
+
+</body>
+</html>

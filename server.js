@@ -3,6 +3,14 @@ var app = express()
 //var fs = require('fs')
 //-------------------------------------------------------------
 
+
+var body_parser   = require('body-parser')
+app.use(body_parser()) //Express 4
+
+var multipart = require('connect-multiparty')
+app.use(multipart()) //Express 4
+
+
 //-------------------------------------------------------------
 //instancia lector de directorios
 var manage_files = require("./manage_files")
@@ -11,7 +19,6 @@ var getMapaBiblioteca = require("./manage_tags.js")
 var path_biblioteca = __dirname+"/public/music"
 
 //-------------------------------------------------------------
-
 // se declara el directorio public para uso de almacenamiento
 // de archivos estaticos
 app.use('/public', express.static(__dirname + '/public'));
@@ -19,23 +26,29 @@ app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.use('/img', express.static(__dirname + '/img'));
 app.use('/js', express.static(__dirname + '/js'));
 
+//es necesaria para poder hacer la subida de archivos con NodeJS y Express
+//app.use(express.multipart());
 //-------------------------------------------------------------
 app.get('/',function(req,res){
 
 	var paths = manage_files.getPathsSongs(path_biblioteca);
 
 	console.log(paths)
-
+	/**/
 	var artistas = new getMapaBiblioteca(paths);
 
 	artistas.on('artistsReady', function(artists) {
-		//console.log(artists)
+		console.log("los artistas son:--> ")
+		console.log(artists)
 		res.render('home.ejs', {"artists":artists,"lista_canciones":false});
 	});	
 	
 });
 
 app.get('/reproductor', function(req,res){
+
+	//res.addHeader("Access-Control-Allow-Origin", "*");
+	
 
 	var nom_directory = req.query.path_album.replace(/\/+\w+\/+\w+\/+\w+\/+\w+\/+/g, '');
 
@@ -59,29 +72,17 @@ app.get('/reproductor', function(req,res){
 
 	var paths = manage_files.getPathsSongs(path_biblioteca);
 
-	console.log(paths)
+	//console.log(paths)
 
 	var artistas = new getMapaBiblioteca(paths);
 
 	artistas.on('artistsReady', function(artists) {
-		//console.log(artists)
-		//createAlbum(lista_audio, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre)
+		console.log("los artistas son:--> ")
+		console.log(artists)
 		res.render("home.ejs", {"artists":artists,"info":createInfo(nombre_album, anio_album, nombre_artista, genre),"cover":createCover(nom_directory, path_album),"lista_canciones":createListaCanciones(lista_audio,nom_directory)});
 	});
 })
 
-//clase renderizador
-function createAlbum(lista, path_album, nom_directory, nombre_album, anio_album, nombre_artista, genre){
-
-	var res = "";
-	
-	res += createDivColMd(4, createCover(nom_directory, path_album), ["text-center"]);
-
-	res += createDivColMd(4, createListaCanciones(lista, nom_directory), []);
-	res += createDivColMd(4, createInfo(nombre_album, anio_album, nombre_artista, genre), ["text-center"]);
-
-	return createDivColMd(12, res, []);
-}
 
 function createDivColMd(md, contenido, arr_clases){
 	var clases = arr_clases.join(" ");
@@ -91,7 +92,7 @@ function createDivColMd(md, contenido, arr_clases){
 
 //----------------------------------------------------------------------
 function createInfo(nombre_album, anio_album, nombre_artista, genre){
-	return "<ul class='info-album list-group'> <li class='list-group-item'> Artista: "+nombre_artista+"</li> <li class='list-group-item'> Album: "+nombre_album+"</li> <li class='list-group-item'> Género: "+genre+"</li> <li class='list-group-item'> Año: "+anio_album+"</li> </ul>";
+	return "<ul class='info-album list-group'> <li class='list-group-item'> Artista: "+nombre_artista+" </li> <li class='list-group-item'> Album: "+nombre_album+"</li> <li class='list-group-item'> Género: "+genre+"</li> <li class='list-group-item'> Año: "+anio_album+"</li> </ul>";
 }
 
 function createCover(nombre, path_album){
@@ -120,6 +121,51 @@ function createLiSong(nombre_cancion, nombre_album){
 }
 //----------------------------------------------------------------------
 
+app.get('/add_album', function(req, res){
+	res.render('add_album.ejs',{"notification":{"estado":"ok","mensaje":"Listo para subir archivos."}})
+})
+
+app.post('/upload', function(req, res) {
+   //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
+   var fs = require('fs')
+   
+
+   var archivos = req.files.archivo
+   var nom_carpeta = req.body.nom_album
+
+   fs.mkdirSync(__dirname+'/public/music/'+nom_carpeta);
+
+   //var newPath = './public/music/'+nom_carpeta+'/'+nom_original
+   var newPath = './public/music/'+nom_carpeta+'/'
+
+   archivos.forEach(function(element, index){
+
+   	   var path = element.path
+	   var nom_original = element.originalFilename  
+	   
+	   var is = fs.createReadStream(path)
+	   var os = fs.createWriteStream(newPath+nom_original)
+
+	   //crear el directorio en donde va el album
+
+	   is.pipe(os)
+
+	   is.on('end', function() {
+	      //eliminamos el archivo temporal
+	      fs.unlinkSync(path)
+	   })
+	    
+   })
+
+   //var dir = __dirname + '/upload';
+
+	//if (!fs.existsSync(newPath)) {
+		//crea el directorio
+	    //fs.mkdirSync(__dirname+'/public/music/'+nom_carpeta);
+	//}
+
+   res.render('add_album.ejs',{"notification":{"estado":"ok","mensaje":"Archivos subidos con éxito."}})
+})
 
 //-------------------------------------------------------------
 app.listen(3000, function(){

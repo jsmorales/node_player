@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>Node Player</title>
 	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="node_modules/bootswatch/cyborg/bootstrap.css">
 	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
 	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/audio_player.js"></script>
+	<script type="text/javascript" src="js/metallum.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
 </head>
 <body>
@@ -17,11 +18,16 @@
 			
 			<a href="/" class="icon-logo"> <h4><span class="glyphicon glyphicon-play-circle"></span> Node Player</h4> </a>					
 
-			<h3 class="text-center">Artista / Album</h3>
+						
 			
-			<hr>				
-			
+			<a href="/add_album"> <span class="glyphicon glyphicon-plus"></span> Añadir </a>
+
+						
 			<% if(artists){ %>
+
+				<h4 class="text-center">Artista <span class="badge"><%= artists.length%></span> / Album </h4> 
+
+				<hr>
 				
 				<div class="list-group lista-artistas">
 
