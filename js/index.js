@@ -8,4 +8,5 @@ $(function(){
 	/*
 	self.metallum_api = new metallum();
 	metallum_api.init()*/
+	
 })

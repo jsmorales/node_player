@@ -106,7 +106,7 @@ function createCover(nombre, path_album){
 
 function createListaCanciones(lista, nombre_album){
 
-	var res = "<div class='list-group lista-canciones'>";
+	var res = "<div class='lista-canciones'>";
 
 	lista.forEach( function(element, index) {
 		res += createLiSong(element, nombre_album);
