@@ -2,22 +2,22 @@ var express = require("express")
 var app = express()
 //var fs = require('fs')
 //-------------------------------------------------------------
-
-
 var body_parser   = require('body-parser')
 app.use(body_parser()) //Express 4
 
 var multipart = require('connect-multiparty')
 app.use(multipart()) //Express 4
-
-
 //-------------------------------------------------------------
 //instancia lector de directorios
 var manage_files = require("./manage_files")
 var getMapaBiblioteca = require("./manage_tags.js")
 
-var path_biblioteca = __dirname+"/public/music"
+//--------------------------------------------------------------
+//manejo de ejecucion de comandos shell
+var exec_shell = require("./manage_exec_shell.js")
+//--------------------------------------------------------------
 
+var path_biblioteca = __dirname+"/public/music"
 //-------------------------------------------------------------
 // se declara el directorio public para uso de almacenamiento
 // de archivos estaticos
@@ -137,6 +137,21 @@ app.post('/upload', function(req, res) {
    res.render('add_album.ejs',{"notification":{"estado":"ok","mensaje":"Archivos subidos con éxito."}})
 })
 
+//informacion de la app ---------------------------------------
+app.get('/info_app', function(req, res){
+
+	
+	var objt_disco = {
+		"tam":exec_shell.getTamanioDisco(),
+		"usado":exec_shell.getUsadoDisco(),
+		"disponible":exec_shell.getDisponibleDisco(),
+		"uso_per":exec_shell.getUsoPerDisco(),
+		"uso_app":exec_shell.getUsoApp()
+	}
+	
+
+	res.render("info_app.ejs", {"info_disco":objt_disco})
+})
 //-------------------------------------------------------------
 /*
 Puertos: 

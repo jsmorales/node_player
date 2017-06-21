@@ -2,23 +2,35 @@
 <html>
 	<% include partials/header %>
 <body>
-	<!---->
-	<div class="navbar">
-		
-		<div class="container-fluid">
-			
-			<a href="/" class="navbar-brand"> <span class="glyphicon glyphicon-play-circle"></span> Node Player </a>
-			
-			<ul class="nav navbar-nav">				
+
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a href="/" class="navbar-brand" title="Home"> <span class="glyphicon glyphicon-play-circle"></span> Node Player </a>
+	    </div>
+
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	      <ul class="nav navbar-nav">				
 				<li>					
-				    <a href="#" data-toggle="offcanvas" data-target="#myNavmenu"> <span class="glyphicon glyphicon-user"></span> Album/Artsta</a>
+				    <a href="#" data-toggle="offcanvas" data-target="#myNavmenu" title="Ver lista de Albums y Artistas"> <span class="glyphicon glyphicon-user"></span> Album/Artsta</a>
 				</li>
-				<li class="active">
-					<a href="/add_album"> <span class="glyphicon glyphicon-plus"></span> Añadir Album</a>
+				<li>
+					<a href="/add_album" title="Añadir un nuevo album"> <span class="glyphicon glyphicon-plus"></span> Añadir Album</a>
+				</li>
+				<li>
+					<a href="/info_app" title="Información de la aplicación"> <span class="glyphicon glyphicon-stats"></span> App Stats</a>
 				</li>
 			</ul>
-		</div>
-	</div>
+	    </div>
+	  </div>
+	</nav>
+
 
 	<nav id="myNavmenu" class="navmenu navmenu-inverse navmenu-fixed-left offcanvas" role="navigation">
 
