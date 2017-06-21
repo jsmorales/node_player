@@ -48,92 +48,118 @@ var getMapaBiblioteca = function(arr){
 	
     var self = this,
         tamanio = arr.length,
+        contador = 0,
         artists = [],
     	albums = [],
         f_artists = [];
 
-    arr.forEach(function(path_song, index){
+    function leeMasContador(){
 
-        /**/
-        id3({ file: path_song, type: id3.OPEN_LOCAL }, function(err, tags) {
-            
-            var artista = tags.artist ? tags.artist.replace(/\0/g, '') : "Artista Desconocido";
+        id3({ file: arr[contador], type: id3.OPEN_LOCAL }, function(err, tags) {
 
-            var album = tags.album ? tags.album.replace(/\0/g, '') : "Album Desconocido";
+            if (err) {
+                throw err
+            } else {
+                //-----------------------------------------------------------
+                var artista = tags.artist ? tags.artist.replace(/\0/g, '') : "Artista Desconocido";
 
-            var path_album = path_song.replace(/\/+[\d.-\w()\'& ,;\\]+(.mp3)\b/g, '');
+                var album = tags.album ? tags.album.replace(/\0/g, '') : "Album Desconocido";
 
-            function artistNoExist(artista){
+                var path_album = arr[contador].replace(/\/+[\d.-\w()\'& ,;\\]+(.mp3)\b/g, '');
 
-                if (artists.indexOf(artista) === -1) {
-                    return true;
-                }else{
-                    return false;
-                }
-            }
+                function artistNoExist(artista){
 
-            function albumNoExist(album){
-
-                if (albums.indexOf(album) === -1) {
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-
-            function createArtist(artista){
-
-                artists.push(artista)
-
-                f_artists.push({"name":artista, "albums":[]})
-
-                console.log(f_artists)
-            }
-
-            function createAlbum(album){
-
-                albums.push(album)
-
-                console.log(albums)
-
-                f_artists.forEach(function(artista_data, index){
-
-                    if (artista_data.name === artista) {
-                        
-                        f_artists[index].albums.push({"name":album,"path":path_album,"year":tags.year,"genre":tags.v2.genre})   
+                    if (artists.indexOf(artista) === -1) {
+                        return true;
+                    }else{
+                        return false;
                     }
-                    
-                })
-            }
-
-            if (artistNoExist(artista)) {
-                
-                createArtist(artista)
-                
-                if (albumNoExist(album)) {
-                    
-                    createAlbum(album)
                 }
 
-            }else{
+                function albumNoExist(album){
 
-                if (albumNoExist(album)) {
-                    
-                    createAlbum(album)
+                    if (albums.indexOf(album) === -1) {
+                        return true;
+                    }else{
+                        return false;
+                    }
                 }
-            }           
 
+                function createArtist(artista){
 
-            if(index+1 === tamanio){
+                    artists.push(artista)
 
-                console.log("Termino de armar el array.")                
+                    f_artists.push({"name":artista, "albums":[]})
 
-                self.emit('artistsReady', f_artists);
+                    console.log(f_artists)
+                }
+
+                function createAlbum(album){
+
+                    albums.push(album)
+
+                    console.log(albums)
+
+                    f_artists.forEach(function(artista_data, index){
+
+                        if (artista_data.name === artista) {
+                            
+                            f_artists[index].albums.push({"name":album,"path":path_album,"year":tags.year,"genre":tags.v2.genre})   
+                        }
+                        
+                    })
+                }
+
+                if (artistNoExist(artista)) {
+                    
+                    createArtist(artista)
+                    
+                    if (albumNoExist(album)) {
+                        
+                        createAlbum(album)
+                    }
+
+                }else{
+
+                    if (albumNoExist(album)) {
+                        
+                        createAlbum(album)
+                    }
+                }
+                //-----------------------------------------------------------
+                self.emit('artistsContinue');
             }
         });
-        
+
+        //console.log(arr[374])
+        console.log("Tamanio:"+tamanio+" contador: "+contador)
+
+    }
+
+    self.on("artistsContinue", function(){          
+
+        if(validaArr()){
+            contador++;
+            leeMasContador()
+            console.log("Debería ejecutar leerMasContador")
+        }else{
+            console.log("Termina de leer el array de paths.")
+            //-----------------------------------------------
+            self.emit('artistsReady', f_artists);
+        }
     })
-    
+
+    function validaArr(){
+
+        if ( contador !== (tamanio-1) )  {
+            return true;
+        } else {            
+            return false;
+        }
+    }
+        
+    leeMasContador()
+
 }
 
 util.inherits(getMapaBiblioteca,EventEmitter);
