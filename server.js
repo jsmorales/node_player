@@ -138,6 +138,11 @@ app.post('/upload', function(req, res) {
 })
 
 //-------------------------------------------------------------
+/*
+Puertos: 
+local - 3000
+c9 - process.env.PORT, process.env.IP
+*/
 app.listen(3000, function(){
 	console.log("node-player: online.")
 })
