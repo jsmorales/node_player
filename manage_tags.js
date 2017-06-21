@@ -45,14 +45,12 @@ var objt_music = {
 }*/
 
 var getMapaBiblioteca = function(arr){
-	var self = this;
-    var tamanio = arr.length;    
-
-    var artists = [],
-    	albums = [];
-
-
-    var f_artists = [];
+	
+    var self = this,
+        tamanio = arr.length,
+        artists = [],
+    	albums = [],
+        f_artists = [];
 
     arr.forEach(function(path_song, index){
 
@@ -135,12 +133,7 @@ var getMapaBiblioteca = function(arr){
         });
         
     })
-    /*
-    emisorId3.on('artistsReady', function(artists) {
-        console.log("Se emite el evento artistsReady.");
-        console.log(artists)
-    });*/
-
+    
 }
 
 util.inherits(getMapaBiblioteca,EventEmitter);

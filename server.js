@@ -31,11 +31,8 @@ app.use('/js', express.static(__dirname + '/js'));
 //-------------------------------------------------------------
 app.get('/',function(req,res){
 
-	var paths = manage_files.getPathsSongs(path_biblioteca);
-
-	console.log(paths)
-	/**/
-	var artistas = new getMapaBiblioteca(paths);
+	var paths = manage_files.getPathsSongs(path_biblioteca),
+		artistas = new getMapaBiblioteca(paths);
 
 	artistas.on('artistsReady', function(artists) {
 		console.log("los artistas son:--> ")
@@ -47,46 +44,31 @@ app.get('/',function(req,res){
 
 app.get('/reproductor', function(req,res){
 
-	//res.addHeader("Access-Control-Allow-Origin", "*");
-	
+	//res.render('home.ejs', {"artists":false,"lista_canciones":false});	
 
-	var nom_directory = req.query.path_album.replace(/\/+\w+\/+\w+\/+\w+\/+\w+\/+/g, '');
+	var nom_directory = req.query.path_album.replace(/\/+\w+\/+\w+\/+\w+\/+\w+\/+/g, ''),
+		path_album = req.query.path_album,
+		nombre_album = req.query.nombre_album,
+		anio_album = req.query.anio,
+		nombre_artista = req.query.nombre_artista,
+		genre = req.query.genre,
+		lista_audio = manage_files.getAlbum(req.query.path_album),
+		paths = manage_files.getPathsSongs(path_biblioteca),
+		artistas = new getMapaBiblioteca(paths);
 
-	var path_album = req.query.path_album;
 
-	var nombre_album = req.query.nombre_album;
-
-	var anio_album = req.query.anio;
-
-	var nombre_artista = req.query.nombre_artista;
-
-	var genre = req.query.genre;
-
-	//console.log(path_album)
-
-	var lista_audio = manage_files.getAlbum(req.query.path_album)
-
-	//console.log(lista_audio);
-
-	//console.log(path_album+"/"+lista_audio[0	
-
-	var paths = manage_files.getPathsSongs(path_biblioteca);
-
-	//console.log(paths)
-
-	var artistas = new getMapaBiblioteca(paths);
 
 	artistas.on('artistsReady', function(artists) {
 		console.log("los artistas son:--> ")
 		console.log(artists)
 		res.render("home.ejs", {"artists":artists,"info":createInfo(nombre_album, anio_album, nombre_artista, genre),"cover":createCover(nom_directory, path_album),"lista_canciones":createListaCanciones(lista_audio,nom_directory)});
 	});
+
 })
 
 
 function createDivColMd(md, contenido, arr_clases){
 	var clases = arr_clases.join(" ");
-
 	return '<div class="col-md-'+md+' '+clases+'">'+contenido+'</div>';
 }
 
@@ -96,22 +78,16 @@ function createInfo(nombre_album, anio_album, nombre_artista, genre){
 }
 
 function createCover(nombre, path_album){
-
 	//console.log(manage_files.getCover(path_album).length)
-	
 	var src = manage_files.getCover(path_album).length > 0 ? "/public/music/"+nombre+"/"+manage_files.getCover(path_album)[0] : "/img/missing.png";
-
 	return "<img class='img-responsive img-cover' src='"+src+"' height='300' width='300'>";
 }
 
 function createListaCanciones(lista, nombre_album){
-
 	var res = "<div class='lista-canciones'>";
-
 	lista.forEach( function(element, index) {
 		res += createLiSong(element, nombre_album);
-	});	
-
+	});
 	return res+"</div>";
 }
 
@@ -157,13 +133,7 @@ app.post('/upload', function(req, res) {
 	    
    })
 
-   //var dir = __dirname + '/upload';
-
-	//if (!fs.existsSync(newPath)) {
-		//crea el directorio
-	    //fs.mkdirSync(__dirname+'/public/music/'+nom_carpeta);
-	//}
-
+   
    res.render('add_album.ejs',{"notification":{"estado":"ok","mensaje":"Archivos subidos con éxito."}})
 })
 
