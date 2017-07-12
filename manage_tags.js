@@ -114,10 +114,10 @@ var getMapaBiblioteca = function(arr){
                     
                     createArtist(artista)
                     
-                    if (albumNoExist(album)) {
+                    //if (albumNoExist(album)) {
                         
                         createAlbum(album)
-                    }
+                    //}
 
                 }else{
 
@@ -142,6 +142,7 @@ var getMapaBiblioteca = function(arr){
             contador++;
             leeMasContador()
             console.log("Debería ejecutar leerMasContador")
+            self.emit('artistsLoad');
         }else{
             console.log("Termina de leer el array de paths.")
             //-----------------------------------------------
@@ -151,9 +152,9 @@ var getMapaBiblioteca = function(arr){
 
     function validaArr(){
 
-        if ( contador !== (tamanio-1) )  {
+        if ( contador !== (tamanio-1) ){
             return true;
-        } else {            
+        } else {
             return false;
         }
     }

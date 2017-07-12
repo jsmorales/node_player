@@ -71,3 +71,17 @@ exports.getPathsSongs = function(srcpathbiblioteca){
 
     return paths_songs;   
 }
+
+var rimraf = require('rimraf');
+
+
+exports.removeAlbum = function(path){
+
+    var res = rimraf(path, function(err, msj){
+        if (err) {
+            throw err;
+        } else {
+            console.log(msj)
+        }
+    });
+}

@@ -37,7 +37,12 @@
 			
 			<h3>Información de Uso de Disco</h3>
 
-			<hr>	  
+			<hr>
+
+			<p><span class="label label-info">Usado por la Aplicación <%=uso_app%></span> </p>	  
+
+		  	
+		  	<p><span class="label label-danger">Disco /</span></p>
 
 		  	<table class="table table-striped table-hover ">
 		  		
@@ -45,9 +50,7 @@
 				    <tr>
 				      <th>Tamaño</th>
 				      <th>Usado</th>
-				      <th>Disponible</th>
-				      
-				      <th>Usado por la aplicación</th>
+				      <th>Disponible</th>				      
 				    </tr>
 				  </thead>
 
@@ -55,15 +58,11 @@
 				  	<tr>
 				      <td><%= info_disco.tam%></td>
 				      <td><%= info_disco.usado%></td>
-				      <td><%= info_disco.disponible%></td>
-				      
-				      <td><%= info_disco.uso_app%></td>
+				      <td><%= info_disco.disponible%></td>				      
 				    </tr>
 				  </tbody>
 
 		  	</table>
-
-		  	<p><span class="label label-danger">Disco Usado</span></p>		
 
 			<div class="progress progress-striped active">
 			  <div class="progress-bar progress-bar-danger" style="width: <%= info_disco.uso_per%>">
@@ -71,8 +70,35 @@
 			  </div>
 			</div>
 
-		  
+		  	
+			<p><span class="label label-danger">Disco /home</span> </p>	
 
+		  	<table class="table table-striped table-hover ">
+		  		
+		  		<thead>
+				    <tr>
+				      <th>Tamaño</th>
+				      <th>Usado</th>
+				      <th>Disponible</th>				      
+				    </tr>
+				  </thead>
+
+				  <tbody>
+				  	<tr>
+				      <td><%= info_disco_home.tam%></td>
+				      <td><%= info_disco_home.usado%></td>
+				      <td><%= info_disco_home.disponible%></td>
+				    </tr>
+				  </tbody>
+
+		  	</table>
+
+			<div class="progress progress-striped active">
+			  <div class="progress-bar progress-bar-danger" style="width: <%= info_disco_home.uso_per%>">
+			  	<%= info_disco_home.uso_per%>
+			  </div>
+			</div>
+			
 	</div>
 
 </body>

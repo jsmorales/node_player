@@ -31,16 +31,34 @@ app.use('/js', express.static(__dirname + '/js'));
 //-------------------------------------------------------------
 app.get('/',function(req,res){
 
-	var paths = manage_files.getPathsSongs(path_biblioteca),
-		artistas = new getMapaBiblioteca(paths);
+	var paths = manage_files.getPathsSongs(path_biblioteca);
 
-	artistas.on('artistsReady', function(artists) {
-		console.log("los artistas son:--> ")
-		console.log(artists)
-		res.render('home.ejs', {"artists":artists,"lista_canciones":false});
-	});	
+	//console.log(paths.length)
+
+	if (paths.length !== 0) {
+
+		var	artistas = new getMapaBiblioteca(paths);
+
+
+		artistas.on('artistsLoad', function(){
+			console.log("Cargando Artistas...")
+		})
+
+		artistas.on('artistsReady', function(artists) {
+			console.log("los artistas son:--> ")
+			console.log(artists)
+			res.render('home.ejs', {"artists":artists,"lista_canciones":false});
+		});	
+
+	} else {
+		res.render('home.ejs', {"artists":false,"lista_canciones":false});
+	}
 	
 });
+
+//-------------------------------------------------------------
+
+//-------------------------------------------------------------
 
 app.get('/reproductor', function(req,res){
 
@@ -97,6 +115,17 @@ function createLiSong(nombre_cancion, nombre_album){
 }
 //----------------------------------------------------------------------
 
+app.get('/remove_album', function(req, res){
+	
+	var path = req.query.path
+
+	console.log(path)
+
+	manage_files.removeAlbum(path);
+
+	res.render('remove_album.ejs', {"mensaje":"El album "+path+" ha sido eliminado."})
+})
+
 app.get('/add_album', function(req, res){
 	res.render('add_album.ejs',{"notification":{"estado":"ok","mensaje":"Listo para subir archivos."}})
 })
@@ -107,7 +136,7 @@ app.post('/upload', function(req, res) {
    
 
    var archivos = req.files.archivo
-   var nom_carpeta = req.body.nom_album
+   var nom_carpeta = req.body.nom_artista+" - "+req.body.nom_album
 
    fs.mkdirSync(__dirname+'/public/music/'+nom_carpeta);
 
@@ -142,15 +171,21 @@ app.get('/info_app', function(req, res){
 
 	
 	var objt_disco = {
-		"tam":exec_shell.getTamanioDisco(),
-		"usado":exec_shell.getUsadoDisco(),
-		"disponible":exec_shell.getDisponibleDisco(),
-		"uso_per":exec_shell.getUsoPerDisco(),
-		"uso_app":exec_shell.getUsoApp()
+		"tam":exec_shell.getTamanioDisco("/"),
+		"usado":exec_shell.getUsadoDisco("/"),
+		"disponible":exec_shell.getDisponibleDisco("/"),
+		"uso_per":exec_shell.getUsoPerDisco("/")		
+	}
+
+	var objt_disco_home = {
+		"tam":exec_shell.getTamanioDisco("/home"),
+		"usado":exec_shell.getUsadoDisco("/home"),
+		"disponible":exec_shell.getDisponibleDisco("/home"),
+		"uso_per":exec_shell.getUsoPerDisco("/home")		
 	}
 	
 
-	res.render("info_app.ejs", {"info_disco":objt_disco})
+	res.render("info_app.ejs", {"info_disco":objt_disco, "info_disco_home":objt_disco_home,"uso_app":exec_shell.getUsoApp()})
 })
 //-------------------------------------------------------------
 /*
