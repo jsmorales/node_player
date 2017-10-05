@@ -1,7 +1,7 @@
 $(function(){
-	
+
 	//console.log("Hola reproductor")
-	//--------------------------------------------------------------------------------	
+	//--------------------------------------------------------------------------------
 	self.audio_player = new audioPlayer();
 	audio_player.initAudioPlayer()
 
@@ -18,9 +18,9 @@ $(function(){
 
 		if (confirma) {
 			window.location = "/remove_album?path="+$(this).data('path')
-		}	
+		}
 
 		return false;
 	});
-	
+
 })
